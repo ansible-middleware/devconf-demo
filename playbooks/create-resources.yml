@@ -1,0 +1,7 @@
+- name: Create vm's
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create resources on openstack.
+      ansible.builtin.include_role:
+        name: "openstack"

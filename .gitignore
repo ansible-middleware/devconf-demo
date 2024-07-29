@@ -1,0 +1,4 @@
+*.log
+*.zip
+rhn-creds.yml
+ansible.cfg

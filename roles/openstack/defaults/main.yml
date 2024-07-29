@@ -1,0 +1,20 @@
+---
+state: present
+auth_url: https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000
+project_name: middleware-automation
+project_id: f04f4717f5644060afb34f7bcd588159
+user_domain_name: "redhat.com"
+region_name: regionOne
+availability_zone: nova
+image: RHEL-8.6.0-x86_64-ga-latest
+boot_from_volume: yes
+volume_size: 40
+flavor: ci.m1.large
+network: provider_net_cci_7
+key_name: ansible_aah_key
+security_groups: default
+default_password: 123qwe
+terminate_volumes: yes
+vm:
+  - wildfly-0
+  - wildfly-1

@@ -1,0 +1,11 @@
+---
+- name: Cleanup vm's
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  tasks:
+    - name: Destroy resources on openstack.
+      ansible.builtin.include_role:
+        name: "openstack"
+      vars:
+        action: destroy
