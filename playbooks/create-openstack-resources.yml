@@ -1,7 +1,12 @@
 - name: Create vm's
+  connection: local
   hosts: localhost
-  gather_facts: false
+  gather_facts: true
   tasks:
     - name: Create resources on openstack.
       ansible.builtin.include_role:
         name: "openstack"
+
+    - name: Refresh inventory
+      ansible.builtin.meta: refresh_inventory
+

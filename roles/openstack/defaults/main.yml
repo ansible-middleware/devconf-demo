@@ -1,20 +1,25 @@
 ---
 state: present
 auth_url: https://rhos-d.infra.prod.upshift.rdu2.redhat.com:13000
+auth_type: "v3applicationcredential"
 project_name: middleware-automation
 project_id: f04f4717f5644060afb34f7bcd588159
 user_domain_name: "redhat.com"
+user_name: hcheruku
+user_id: 4a766fdd7382980917dd26484f47bb45038eb27a82f433b53f412d51c54a42bd
+project_domain_id: "62cf1b5ec006489db99e2b0ebfb55f57"
 region_name: regionOne
 availability_zone: nova
 image: RHEL-8.6.0-x86_64-ga-latest
 boot_from_volume: yes
 volume_size: 40
-flavor: ci.m1.large
+flavor: m1.medium
 network: provider_net_cci_7
-key_name: ansible_aah_key
+key_name: devconf
 security_groups: default
 default_password: 123qwe
 terminate_volumes: yes
+group: "label_app_demo"
 vm:
-  - wildfly-0
-  - wildfly-1
+  - name: devconf-demo-eap-demo-1	
+  - name: devconf-demo-eap-demo-2

@@ -1,2 +1,5 @@
-openstacksdk==0.61
+openstacksdk
 python-openstackclient
+jsonpatch
+kubernetes>=28.1.0
+PyYAML>=3.11

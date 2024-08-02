@@ -1,33 +1,15 @@
 ---
-- name: Query all network ports
-  openstack.cloud.port_info:
-    auth:
-      auth_url: "{{ auth_url }}"
-      username: "{{ openstack_username }}"
-      password: "{{ openstack_password }}"
-      project_id: "{{ project_id }}"
-      user_domain_name: "{{ user_domain_name }}"
-    region_name: "{{ region_name }}"
-  register: openstack_ports
-
-- name: Validate Port Exists
-  ansible.builtin.assert:
-    that:
-      - (openstack_ports.openstack_ports | selectattr('name', 'equalto', item.name) | list) | length == 1
-    fail_msg: "Port {{ item.name }} does not exist"
-    quiet: true
-  loop: "{{ vm }}"
-
 - name: launch an instance
   openstack.cloud.server:
     state: "{{ state }}"
+    auth_type: "{{ auth_type }}"
     auth:
       auth_url: "{{ auth_url }}"
-      username: "{{ openstack_username }}"
-      password: "{{ openstack_password }}"
-      project_id: "{{ project_id }}"
-      user_domain_name: "{{ user_domain_name }}"
+      project_domain_id: "{{ project_domain_id }}"
+      application_credential_id: "{{ application_credential_id }}"
+      application_credential_secret: "{{ application_credential_secret }}"
     region_name: "{{ region_name }}"
+    interface: "public"
     name: "{{ item.name }}"
     availability_zone: "{{ availability_zone }}"
     image: "{{ image }}"
@@ -36,9 +18,10 @@
     flavor: "{{ flavor }}"
     key_name: "{{ key_name }}"
     terminate_volume: "{{ terminate_volumes }}"
-    security_groups: "{{ [ security_groups ] + item.security_groups | default([]) }}"
-    nics:
-      - port-name: "{{ item.name }}"
+    network: "{{ network }}"
+    meta:
+      hostname: "{{ item.name }}"
+      group: "{{ group }}"
     userdata: |
       #cloud-config
       debug: true
@@ -46,42 +29,8 @@
       disable_root: false
       chpasswd:
         list: |
-          root:{{ default_password }}
-          cloud-user:{{ default_password }}
+          root:123qwe
+          cloud-user:123qwe
         expire: false
   loop: "{{ vm }}"
   register: instances
-
-- name: Wait for connection
-  ansible.builtin.wait_for:
-    host: "{{ item.openstack.public_v4 }}"
-    port: 22
-    timeout: 2000
-    search_regex: OpenSSH
-  loop: "{{ instances.results }}"
-  when: item.openstack is defined
-
-- name: Add instances to os_instances group
-  ansible.builtin.add_host:
-    hostname: "{{ item.openstack.name }}"
-    ansible_host: "{{ item.openstack.public_v4 }}"
-    ansible_port: 22
-    groups: os_instances
-  loop: "{{ instances.results }}"
-  when: item.openstack is defined
-
-- name: Register Instances
-  community.general.redhat_subscription:
-    state: present
-    username: "{{ subscription_username }}"
-    password: "{{ subscription_password }}"
-    auto_attach: true
-  delegate_to: "{{ hostvars[item].ansible_host }}"
-  loop: "{{ groups['os_instances'] }}"
-
-- name: Enable RHSM repositories
-  community.general.rhsm_repository:
-    name: "{{ item.repos }}"
-  when: item.repos is defined
-  delegate_to: "{{ hostvars[item.name].ansible_host }}"
-  loop: "{{ vm }}"

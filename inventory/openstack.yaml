@@ -1,0 +1,6 @@
+plugin: openstack.cloud.openstack
+groups:
+  label_app_demo: "'env=label_app_demo' in (openstack.tags|list)"
+keyed_groups:
+  - key: openstack.tags
+    prefix: tags

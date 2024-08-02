@@ -1,0 +1,64 @@
+---
+- name: Playbook for EAP Hosts install
+  hosts: label_app_demo
+  roles:
+    - redhat.eap.eap_install
+  pre_tasks:
+    - name: Enable and start the firewalld service
+      become: yes
+      ansible.builtin.systemd:
+        name: firewalld
+        enabled: yes
+        state: started
+    - name: "Configure firewall for EAP ports"
+      become: yes
+      ansible.posix.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: yes
+      loop:
+        - 8009/tcp
+        - 8080/tcp
+        - 9990/tcp
+        - 7600/tcp
+        - 7601/tcp
+    - name: Create cluster node list
+      ansible.builtin.set_fact:
+        eap_cluster_nodes: >
+          {{ eap_cluster_nodes | default([]) + [
+               {
+                 "name": item,
+                 "address": 'jgroups-' + item,
+                 "inventory_host": hostvars[item].ansible_default_ipv4.address | default(item) + '[7600]',
+                 "value": hostvars[item].ansible_default_ipv4.address | default(item)
+               }
+             ] }}
+      loop: "{{ ansible_play_batch }}"
+
+- name: Playbook for EAP Hosts config
+  hosts: label_app_demo
+  become: yes
+  roles:
+    - redhat.eap.eap_systemd
+
+- name: Playbook for EAP Hosts config and app deployment
+  hosts: label_app_demo
+  become: yes
+  serial: 1
+  post_tasks:
+    - name: Verify management port is accessible
+      ansible.builtin.wait_for:
+        port: 9990
+        host: localhost
+        connect_timeout: 3
+        delay: 10
+        timeout: 60
+    - name: "Download demo app to deploy from {{ app_url }} into deployments"
+      ansible.builtin.get_url:
+        url: "{{ app_url }}"
+        dest: "{{ eap.home }}/standalone/deployments/info.war"
+        owner: eap
+        group: eap
+        mode: 0644
+

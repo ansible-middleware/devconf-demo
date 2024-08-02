@@ -1,12 +1,12 @@
 ---
 - name: Remove OpenStack instance
   openstack.cloud.server:
+    auth_type: "{{ auth_type }}"
     auth:
       auth_url: "{{ auth_url }}"
-      username: "{{ openstack_username }}"
-      password: "{{ openstack_password }}"
-      project_id: "{{ project_id }}"
-      user_domain_name: "{{ user_domain_name }}"
+      project_domain_id: "{{ project_domain_id }}"
+      application_credential_id: "{{ application_credential_id }}"
+      application_credential_secret: "{{ application_credential_secret }}"
     region_name: "{{ region_name }}"
     name: "{{ item.name }}"
     state: absent

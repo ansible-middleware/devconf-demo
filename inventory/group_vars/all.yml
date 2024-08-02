@@ -1,0 +1,35 @@
+---
+rh_no_log: False
+no_log: False
+jvm_package: java-11-openjdk-headless
+eap:
+  home: /opt/jboss_eap/jboss-eap-7.4/
+  user: eap
+  group: eap
+  bind_addr: "{{ override_wildfly_bind_addr | default(ansible_nodename) }}"
+  port_range_offset: 0
+  basedir_prefix: /opt/jboss_eap-
+
+service_systemd_env_file: "/etc/eap.conf"
+service_systemd_conf_file: "/usr/lib/systemd/system/eap.service"
+eap_config_base: standalone-ha.xml
+eap_offline_install: False
+eap_enable_yml_config: True
+eap_statistics_enabled: True
+eap_apply_cp: True
+eap_systemd_enable: True
+eap_bind_addr_private: "{{ ansible_default_ipv4.address }}"
+eap_bind_addr_management: 0.0.0.0
+eap_instance_name: "{{ inventory_hostname }}"
+eap_elytron_adapter: False
+eap_yml_configs: [ eap_ymlconfig.yml.j2 ]
+ansible_distribution: 'RedHat'
+
+jdbc_driver_module_dir: "{{ eap.home }}/modules/org/mariadb/main"
+jdbc_driver_version: 2.7.4
+jdbc_driver_jar_filename: "mariadb-java-client-{{ jdbc_driver_version }}.jar"
+jdbc_driver_jar_url: "https://repo1.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/{{ jdbc_driver_version }}/mariadb-java-client-{{ jdbc_driver_version }}.jar"
+jdbc_driver_jar_installation_path: "{{ jdbc_driver_module_dir }}/{{ jdbc_driver_jar_filename }}"
+jdbc_driver_module_name: "org.mariadb"
+
+app_url: https://drive.google.com/uc?export=download&id=1w9ss5okctnjUvRAxhPEPyC7DmbUwmbhb

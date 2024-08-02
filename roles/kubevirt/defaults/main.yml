@@ -1,0 +1,11 @@
+---
+vm: 
+  - name: eap-demo-1
+  - name: eap-demo-2
+namespace: devconf-demo
+rhel_machine: rhel8
+machine_type: pc-q35-rhel9.2.0
+network_name: devconf-demo/vlan0
+label_app: demo
+instance_type: "u1.medium"
+preference_name: "rhel.8"

@@ -1,0 +1,23 @@
+---
+- name: Playbook for installing prerequisites
+  hosts: label_app_demo
+  tasks:
+    - name: "Manage subscription"
+      redhat.rhel_system_roles.redhat_subscription:
+        state: present
+        username: "{{ subscription_username }}"
+        password: "{{ subscription_password }}"
+        auto_attach: true
+      become: yes
+    - name: "Install packages"
+      ansible.builtin.include_role:
+        name: fastpackages
+      vars:
+        packages_list:
+          - unzip
+          - firewalld
+          - python3-lxml
+          - net-tools
+          - python3-policycoreutils
+          - policycoreutils-python-utils
+          - "{{ jvm_package }}"
