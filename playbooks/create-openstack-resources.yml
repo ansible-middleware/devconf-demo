@@ -6,7 +6,11 @@
     - name: Create resources on openstack.
       ansible.builtin.include_role:
         name: "openstack"
-
+    
+    - name: Pause for 5 minutes to build app cache
+      ansible.builtin.pause:
+        minutes: 1
+    
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory
 
