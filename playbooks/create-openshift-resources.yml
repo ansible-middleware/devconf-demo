@@ -7,9 +7,9 @@
       ansible.builtin.include_role:
         name: "kubevirt"
     
-    - name: Pause for 5 minutes to build app cache
+    - name: Pause
       ansible.builtin.pause:
-        minutes: 1
+        minutes: 2
     
     - name: Refresh inventory
       ansible.builtin.meta: refresh_inventory

@@ -6,3 +6,5 @@ ansible.cfg
 *.sh
 devconf.pub
 clouds.yaml
+services.yaml
+routes.yaml

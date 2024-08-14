@@ -6,6 +6,48 @@
     kind: Namespace
     state: present
 
+- name: Create a Deployment by reading the definition from a local file
+  redhat.openshift.k8s:
+    state: present
+    src: roles/kubevirt/tasks/kube-network-attachment.yaml
+
+- name: Create a Service
+  redhat.openshift.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ name }}"
+        namespace: "{{ namespace }}"
+      spec:
+        selector:
+          app: "{{ name }}"
+        ports:
+          - protocol: TCP
+            targetPort: 8080
+            port: 8080
+
+- name: Create Route
+  redhat.openshift.k8s:
+    definition:
+      kind: Route
+      apiVersion: route.openshift.io/v1
+      metadata:
+        name: "{{ name }}"
+        namespace: "{{ namespace }}"
+      spec:
+        host: "{{ host }}"
+        to:
+          kind: Service
+          name: "{{ name }}"
+          weight: 100
+        port:
+          targetPort: 8080
+        tls:
+          termination: edge
+          insecureEdgeTerminationPolicy: Redirect
+
 - name: Create a VirtualMachine
   redhat.openshift_virtualization.kubevirt_vm:
     state: present
@@ -32,16 +74,22 @@
       domain:
         devices:
           interfaces:
+            - masquerade: {}
+              model: "{{ interface_model }}"
+              name: "{{ network_pod_name }}"
             - bridge: {}
-              model: virtio
-              name: default
+              model: "{{ interface_model }}"
+              name: "{{ network_name }}"
+            
         machine:
           type: "{{ machine_type }}"
         resources: {}
       networks:
+        - name: "{{ network_pod_name }}"
+          pod: {}
         - multus:
-            networkName: "{{ network_name }}"
-          name: default
+            networkName: vlan0
+          name: "{{ network_name }}"
       volumes:
         - dataVolume:
             name: "{{ item.name }}-volume"
@@ -63,3 +111,7 @@
           name: cloudinit
     wait: true
   loop: "{{ vm }}"
+
+- name: Wait for system to become reachable over WinRM
+  ansible.builtin.wait_for_connection:
+    timeout: 900

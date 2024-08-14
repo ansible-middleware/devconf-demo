@@ -5,7 +5,11 @@ vm:
 namespace: devconf-demo
 rhel_machine: rhel8
 machine_type: pc-q35-rhel9.2.0
-network_name: devconf-demo/vlan0
 label_app: demo
 instance_type: "u1.medium"
 preference_name: "rhel.8"
+name: demo
+host: demo.apps.mg8df.dynamic.redhatworkshops.io
+network_pod_name: nic-pod-networ
+network_name: nic-mgmt
+interface_model: virtio

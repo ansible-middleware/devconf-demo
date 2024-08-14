@@ -1,7 +1,0 @@
-# oc apply -f kube-project-creation.yaml
-apiVersion: project.openshift.io/v1
-description: "devconf-demo"
-displayName: devconf-demo
-kind: ProjectRequest
-metadata:
-    name: devconf-demo

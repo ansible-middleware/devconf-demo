@@ -3,3 +3,4 @@ namespaces:
   - devconf-demo
 label_selector: app=demo
 create_groups: true
+network_name: nic-mgmt
